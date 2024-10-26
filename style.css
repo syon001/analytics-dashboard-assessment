@@ -1,0 +1,158 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+body{
+    background-color: #161616;
+    color: #fff;
+}
+
+h1{
+    text-align: center;
+    padding: 8px;
+    text-decoration: underline;
+    text-transform: uppercase;
+}
+
+.filtersec{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    align-items: center;
+}
+
+.filtersec div:first-child,
+.filtersec div:nth-child(2),
+.filtersec div:last-child{
+    width: 500px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.filtersec div:nth-child(3){
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+}
+
+.filtersec div span select{
+    width: 100%;
+}
+
+select{
+    padding: 8px 4px;
+    border-radius: 4px;
+    margin-top: 4px;
+    background-color: #4b4b4b;
+    color: #fff;
+}
+
+button{
+    background-color: #4b4b4b;
+    color: #fff;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.graphlink{
+    display: flex;
+    justify-content: end;
+    max-width: 1000px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.graphlink span a{
+    text-decoration: none;
+    color: #fff;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.graphlink span a:hover{
+    color: #ccc;
+}
+
+.graphlink span a{
+    font-size: 24px;
+}
+
+.tabledata{
+    max-width: 1000px;
+    overflow-x: scroll;    
+    border: 1px solid #ddd;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    
+}
+th, td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+th {
+    background-color: #000;
+}
+#pagination {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#pagination button {
+    padding: 5px 10px;
+    margin: 0 5px;
+}
+
+
+
+
+
+.backbtn{
+    padding: 12px;
+    cursor: pointer;
+}
+
+.backbtn a{
+    color: #fff;
+    text-decoration: none;
+}
+
+#charts {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+}
+.chart-container {
+    max-width: 800px;
+    width: 100%;
+    display: none;
+}
+#chartSelector {
+    margin-bottom: 20px;
+}
+
+.chartselsec{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-select-none.svg-container{
+    width: inherit !important;
+}

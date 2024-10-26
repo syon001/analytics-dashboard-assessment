@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Vehicle Population Data</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="backbtn">
+        <a href="index.html"><i class="fa-solid fa-arrow-left"></i> back</a>
+    </div>
+
+<div class="chartselsec">
+    <select id="chartSelector">
+        <option value="">Select a Chart</option>
+        <option value="makeChart">Electric Vehicle Population by Make</option>
+        <option value="yearPieChart">Distribution of Electric Vehicle Makes by Year</option>
+        <option value="makeYearPieChart">Distribution of Makes for Each Year</option>
+    </select>
+</div>
+
+<div id="charts">
+    <div id="makeChart" class="chart-container"></div>
+    <div id="yearPieChart" class="chart-container"></div>
+    <div id="makeYearPieChart" class="chart-container"></div>
+</div>
+
+<script>
+Papa.parse("Electric_Vehicle_Population_Data.csv", {
+    download: true,
+    header: true,
+    complete: function(results) {
+        console.log("CSV data loaded:", results.data);
+        processData(results.data);
+    },
+    error: function(error) {
+        console.error("Error fetching CSV file:", error);
+    }
+});
+
+function processData(data) {
+    const makeCounts = {};
+    const yearCounts = {};
+    const makeYearDetails = {};
+
+    data.forEach(vehicle => {
+        const make = vehicle.Make ? vehicle.Make.trim() : "";
+        const type = vehicle["Electric Vehicle Type"] ? vehicle["Electric Vehicle Type"].trim() : "";
+        const year = vehicle["Model Year"] ? vehicle["Model Year"].trim() : "";
+
+        if (make) {
+            if (!makeCounts[make]) {
+                makeCounts[make] = { BEV: 0, PHEV: 0 };
+            }
+            if (type.includes("BEV")) {
+                makeCounts[make].BEV++;
+            } else if (type.includes("PHEV")) {
+                makeCounts[make].PHEV++;
+            }
+        }
+
+        if (year) {
+            if (!yearCounts[year]) {
+                yearCounts[year] = 0;
+                makeYearDetails[year] = new Set();
+            }
+            yearCounts[year]++;
+            makeYearDetails[year].add(make);
+        }
+    });
+
+    const makeLabels = Object.keys(makeCounts);
+    const makeBevCounts = makeLabels.map(make => makeCounts[make].BEV);
+    const makePhevCounts = makeLabels.map(make => makeCounts[make].PHEV);
+
+    const makeTrace1 = {
+        y: makeLabels,
+        x: makeBevCounts,
+        name: '(BEV)',
+        type: 'bar',
+        orientation: 'h',
+        marker: {
+            color: 'rgb(31, 119, 180)',
+            line: { color: '#fff', width: 1.5 }
+        }
+    };
+
+    const makeTrace2 = {
+        y: makeLabels,
+        x: makePhevCounts,
+        name: '(PHEV)',
+        type: 'bar',
+        orientation: 'h',
+        marker: {
+            color: 'rgb(255, 127, 14)',
+            line: { color: '#fff', width: 1.5 }
+        }
+    };
+
+    const makeData = [makeTrace1, makeTrace2];
+
+    const makeLayout = {
+        title: 'Electric Vehicle Population by Make',
+        barmode: 'stack',
+        xaxis: {
+            title: 'Count',
+            linecolor: '#fff',
+            tickcolor: '#fff',
+            titlefont: { color: '#fff' }
+        },
+        yaxis: {
+            title: 'Make',
+            automargin: true,
+            linecolor: '#fff',
+            tickcolor: '#fff',
+            titlefont: { color: '#fff' }
+        },
+        plot_bgcolor: '#4b4b4b',
+        paper_bgcolor: '#4b4b4b',
+        font: { color: '#fff' },
+        responsive: true
+    };
+
+    Plotly.newPlot('makeChart', makeData, makeLayout);
+
+    const yearLabels = Object.keys(yearCounts).sort((a, b) => parseInt(a) - parseInt(b));
+    const yearValues = yearLabels.map(year => yearCounts[year]);
+    const yearText = yearLabels.map(year => Array.from(makeYearDetails[year]).join(', '));
+
+    const yearPieData = [{
+        values: yearValues,
+        labels: yearLabels,
+        type: 'pie',
+        text: yearText,
+        hoverinfo: 'label+text+value+percent',
+        textinfo: 'label',
+        marker: {
+            colors: ['#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3', '#fdb462', '#b3de69', '#fccde5'],
+            line: { color: '#fff', width: 1 }
+        }
+    }];
+
+    const yearPieLayout = {
+        title: 'Distribution of Electric Vehicle Makes by Year',
+        paper_bgcolor: '#4b4b4b',
+        font: { color: '#fff' },
+        responsive: true
+    };
+
+    Plotly.newPlot('yearPieChart', yearPieData, yearPieLayout);
+
+    const makeYearLabels = yearLabels;
+    const makeYearValues = makeYearLabels.map(year => makeYearDetails[year].size);
+
+    const makeYearPieData = [{
+        values: makeYearValues,
+        labels: makeYearLabels,
+        type: 'pie',
+        hoverinfo: 'label+value+percent',
+        textinfo: 'label',
+        marker: {
+            colors: ['#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3', '#fdb462', '#b3de69', '#fccde5'],
+            line: { color: '#fff', width: 1 }
+        }
+    }];
+
+    const makeYearPieLayout = {
+        title: 'Number of Unique Makes for Each Year',
+        paper_bgcolor: '#4b4b4b',
+        font: { color: '#fff' },
+        responsive: true
+    };
+
+    Plotly.newPlot('makeYearPieChart', makeYearPieData, makeYearPieLayout);
+
+    document.getElementById('makeChart').style.display = 'block';
+
+    document.getElementById('chartSelector').addEventListener('change', function() {
+        const selectedChart = this.value;
+        document.querySelectorAll('.chart-container').forEach(chart => {
+            chart.style.display = 'none';
+        });
+        if (selectedChart) {
+            document.getElementById(selectedChart).style.display = 'block';
+        }
+    });
+}
+
+</script>
+
+</body>
+</html>
